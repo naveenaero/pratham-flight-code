@@ -50,7 +50,7 @@ void read_MM(void){
   
   //power_up_peripheral(PMAG);
   ///Poll the magnetometer for readings
-  poll_MM1();
+  poll_MM();
   
   //power_down_peripheral(PMAG);
   

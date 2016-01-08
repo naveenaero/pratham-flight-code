@@ -18,18 +18,21 @@ void init_SPI_slave(void)
 
 void init_SPI(void)
 {
-  ///Set MOSI and SCK output, all others input
-  DDRB = 0;
-  DDRB = _BV(SPICLK) | _BV(SPIDO);
-  
-  
-  DDR_CS |= _BV(SLAVE) | _BV(CC1020) | _BV(ADC_S);
-  ///Switch off all devices
-  PORT_CS |=_BV(SLAVE) | _BV(CC1020) | _BV(ADC_S);
-  
-  ///Enable SPI, Master, set clock rate
-  ///@todo Check frequency 
-  SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0)|(1<<SPR1);
+	///Set MOSI and SCK output, all others input
+	DDRB = 0;
+	DDRB = _BV(SPICLK) | _BV(SPIDO);
+	
+	
+	DDR_CS |= _BV(SLAVE) | _BV(CC1020) | _BV(ADC_S);
+	///Switch off all devices
+	PORT_CS |= _BV(CC1020) | _BV(ADC_S);
+	
+	PORTB&= ~(1<<PB0);
+	///Enable SPI, Master, set clock rate
+	///@todo Check frequency
+	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0)|(1<<SPR1)|(1<<CPOL)|(1<<CPHA);
+	//SPCR &= ~(1<<CPOL);
+	//SPCR &= ~(1<<CPHA);
 }
 
 void init_SPI_trans(uint8_t CS_pin){

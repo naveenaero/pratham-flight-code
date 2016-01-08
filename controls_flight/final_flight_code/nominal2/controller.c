@@ -308,6 +308,7 @@ void control(void){
   detumbling(v_m_D);
   ///Set the torquer values calculated in the last frame
   //set_PWM();
+  /*
   uint8_t c1,c2,d;
   c1= (uint8_t)Current_state.pwm.x;
   c2= (uint8_t)((Current_state.pwm.x)>>8);
@@ -329,7 +330,7 @@ void control(void){
   transmit_UART0(c1);
   transmit_UART0(c2);
   transmit_UART0(d);
-  
+  */
   v_B[0] = Current_state.mm.B_x;
   v_B[1] = Current_state.mm.B_y;
   v_B[2] = Current_state.mm.B_z;
@@ -343,10 +344,9 @@ void control(void){
 	//{
 		if (gps_power==2)
 		{
-   uint8_t q= 90;
-    transmit_UART0(q);
+   
     read_GPS();
-    while(UCSR0B & _BV(RXCIE0));
+    //while(UCSR0B & _BV(RXCIE0));
 		}
 	//}
 	uint8_t a,b,c;
@@ -394,15 +394,14 @@ void control(void){
   //{
 	   
     if(GPS_done == 1)
-      copy_gps_reading();  //check
+      copy_gps_reading();  //check if gps is on but pdop data
 	  else
 	  {
 	  seconds_since_equinox += FRAME_TIME; //  ??jaroori hai ye plz dont delete??
 	  seconds_since_pivot += FRAME_TIME;
 	 // Current_state.gps.time_since_reading += FRAME_TIME;
 	  }
-    uint8_t e=100;
-    transmit_UART0(e);
+    
     read_SS();
 	/*uint8_t sen;
 	for(int i=0;i<6;i=i+1)
@@ -651,11 +650,11 @@ void control(void){
   
   else if(Mode == NOMINAL)*/
 	//change here
-   // if(Mode == DETUMBLING)
-    apply_torque(v_m_D);
+    if(Mode == DETUMBLING);
+    //apply_torque(v_m_D);
     
-    //else if(Mode == NOMINAL)
-    apply_torque(v_m_N);
+    else if(Mode == NOMINAL);
+    //apply_torque(v_m_N);
 	
 	//Mode_prev = Mode;
     

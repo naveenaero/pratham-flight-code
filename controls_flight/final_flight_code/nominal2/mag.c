@@ -13,7 +13,8 @@
 #include "mag.h"
 #include "peripherals.h"
 #include "uart.h"
-
+uint8_t mag_count = 0;
+uint8_t mag_data[7];
 
 void init_UART_MM(void )
 {
@@ -99,41 +100,46 @@ void poll_MM1(void)
       transmit_UART0('\r');
 	  */
 }
+ISR(USART1_RX_vect)//ISR for Magmeter UART
+{
+	int16_t x, y, z;
+	mag_data[mag_count] = UDR1;
+	mag_count++;
+	if (mag_count == 7)
+	{
+		mag_count = 0;
+		x = ((int16_t)mag_data[0])<<8;
+		x &= 0xFF00;
+		x |= (int16_t)mag_data[1];
+		
+		
+		y = ((int16_t)mag_data[2]) << 8;
+		y &= 0xFF00;
+		y |= (int16_t)mag_data[3];
+		
+		z = ((int16_t)mag_data[4]) << 8;
+		z &= 0xFF00;
+		z |= (int16_t)mag_data[5];
+		
+		///Convert the readings to Gauss
+		Current_state.mm.B_x = ((float) x) / 15000;
+		Current_state.mm.B_y = ((float) y) / 15000;
+		Current_state.mm.B_z = ((float) z) / 15000;
+	}
+}
+	
+	
 
 void poll_MM(void)
 {
   ///Temporary variables for magnetometer readings
-  int16_t x, y, z;
+  
   uint8_t tmp;
   
   ///Send the poll command
- // send_MM_cmd("*00P\r");
-  uint8_t c= 80;
-  
-  transmit_UART0(c);
-  x = ((int16_t)receive_MM()) << 8;
-  x &= 0xFF00;
-  x |= (int16_t)receive_MM();
+ send_MM_cmd("*00P\r");
   
   
-  y = ((int16_t)receive_MM()) << 8;
-  y &= 0xFF00;
-  y |= (int16_t)receive_MM();
-  
-  z = ((int16_t)receive_MM()) << 8;
-  z &= 0xFF00;
-  z |= (int16_t)receive_MM();
-  
-  receive_MM();
-  
-  char buf[100];
-  sprintf(buf,"%d %d %d\r",  x, y, z);
-//  send_preflight(buf, strlen(buf));
-    
-  ///Convert the readings to Gauss
-  Current_state.mm.B_x = ((float) x) / 15000;
-  Current_state.mm.B_y = ((float) y) / 15000;
-  Current_state.mm.B_z = ((float) z) / 15000;
 }
 
 uint8_t receive_MM(void)
